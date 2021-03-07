@@ -33,7 +33,7 @@ contract DraftLaws is Ownable {
 
     mapping(uint => DraftLaw) public draftLaws;
     mapping(uint => mapping(address => bool)) public confirmations;
-    mapping(address => bool) isSigner;
+    mapping(address => bool) public isSigner;
     address[] public signers;
     uint public draftlawsCount;
 
@@ -201,6 +201,7 @@ contract DraftLaws is Ownable {
     function getConfirmationCount(uint _draftlawId) public view draftlawExists(_draftlawId)
             returns (uint count)
     {
+        count = 0;
         if(draftLaws[_draftlawId].approved)
             return THRESHOLD;
         for (uint i = 0; i < MAX_SIGNERS; i++) {
@@ -213,7 +214,7 @@ contract DraftLaws is Ownable {
     function getCurrentDraftlawsCount() external view returns(uint count)
     {
         for (uint i = 0; i < draftlawsCount; i ++) {
-            if (!draftLaws[i].approved)
+            if (now < draftLaws[i].expirationTime && !draftLaws[i].approved)
                 count++;
         }
     }
